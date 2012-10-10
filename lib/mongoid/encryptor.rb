@@ -32,13 +32,13 @@ module Mongoid #:nodoc:
       end
     end
 
-    # Returns decrypted value for key.
+    # Overrides Mongo version
     #
     # @param [String] key
     # @return [Object]
     def read_attribute_for_validation(key)
-      v = read_attribute(key)
-      v.try(:encrypted?) ? v.decrypt : v
+      v = super(key)
+      v && v.respond_to?(:encrypted?) && v.encrypted? ? v.decrypt : v
     end
 
     private
