@@ -37,8 +37,8 @@ module Mongoid #:nodoc:
     # @param [String] key
     # @return [Object]
     def read_attribute_for_validation(key)
-      v = super(key)
-      v && v.respond_to?(:encrypted?) && v.encrypted? ? v.decrypt : v
+      v = send(key)
+      (v.respond_to?(:encrypted?) && v.try(:encrypted?)) ? v.decrypt : v
     end
 
     private
@@ -47,7 +47,7 @@ module Mongoid #:nodoc:
     # @param [Class] cipher_class
     # @param [Hash] options
     def write_encrypted_attribute(attr_name, cipher_class, options)
-      value = read_attribute(attr_name.to_sym)
+      value = send(attr_name)
       return if value.blank? or value.encrypted?
 
       cipher = instantiate_cipher(cipher_class, options)
@@ -77,5 +77,4 @@ module Mongoid #:nodoc:
       cipher_class.new(options.dup)
     end
   end
-
 end
